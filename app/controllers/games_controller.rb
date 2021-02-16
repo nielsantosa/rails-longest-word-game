@@ -3,16 +3,15 @@ require 'json'
 
 class GamesController < ApplicationController
   def new
+    start_session
     @letters = []
-    10.times do
-      @letters << ('A'..'Z').to_a.sample
-    end
+    10.times { @letters << ('A'..'Z').to_a.sample }
+    @_total_score = session[:total_score]
   end
 
   def score
     @original_letters = params[:original_letters].upcase
     @answer = params[:answer].upcase
-
     @original_letters_array = @original_letters.split(" ")
 
     # Check 1 : Check if answer got all the letters from original letters
@@ -26,7 +25,6 @@ class GamesController < ApplicationController
         break
       end
     end
-
     # Check 2 : Check if it is a valid word from api
     dict_api_url = "https://wagon-dictionary.herokuapp.com/#{@answer}"
     raw_json = URI.open(dict_api_url).read
@@ -40,6 +38,25 @@ class GamesController < ApplicationController
       @text = "Sorry but #{@answer} is not a valid word."
     else
       @text = "Congratulations! #{@answer} is a valid english word."
+      session[:total_score] += compute_score(@answer)
     end
+
+    @_total_score = session[:total_score]
+  end
+
+  private
+
+  def compute_score(words)
+    words.length * 10
+  end
+
+  def start_session
+    if session[:total_score] == nil
+      session[:total_score] = 0
+    end
+  end
+
+  def refresh_session
+    session[:total_score] = 0
   end
 end
