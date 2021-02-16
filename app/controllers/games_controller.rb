@@ -10,10 +10,10 @@ class GamesController < ApplicationController
   end
 
   def score
-    @original_letters = params[:original_letters]
-    @answer = params[:answer]
+    @original_letters = params[:original_letters].upcase
+    @answer = params[:answer].upcase
 
-    @original_letters_array = @original_letters.downcase.split(" ")
+    @original_letters_array = @original_letters.split(" ")
 
     # Check 1 : Check if answer got all the letters from original letters
     check1 = true
@@ -29,17 +29,17 @@ class GamesController < ApplicationController
 
     # Check 2 : Check if it is a valid word from api
     dict_api_url = "https://wagon-dictionary.herokuapp.com/#{@answer}"
-    raw_json = open(dict_api_url).read
+    raw_json = URI.open(dict_api_url).read
     json = JSON.parse(raw_json)
 
     check2 = json["found"] == true
 
     if !check1
-      @text = "Sorry but #{@answer.upcase} can't be built out of #{@original_letters.gsub(" ",",")}."
+      @text = "Sorry but #{@answer} can't be built out of #{@original_letters.gsub(" ",",")}."
     elsif !check2
-      @text = "Sorry but #{@answer.upcase} is not a valid word."
+      @text = "Sorry but #{@answer} is not a valid word."
     else
-      @text = "Congratulations! #{@answer.upcase} is a valid english word."
+      @text = "Congratulations! #{@answer} is a valid english word."
     end
   end
 end
