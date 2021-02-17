@@ -3,6 +3,7 @@ require 'json'
 
 class GamesController < ApplicationController
   def new
+    # refresh_session
     start_session
     @letters = []
     10.times { @letters << ('A'..'Z').to_a.sample }
